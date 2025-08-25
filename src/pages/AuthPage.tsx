@@ -30,9 +30,15 @@ const AuthPage = () => {
     const { error } = await signIn(email, password);
 
     if (error) {
+      let errorMessage = error.message;
+      if (error.message.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password. Make sure you have confirmed your email address.';
+      } else if (error.message.includes('Email not confirmed')) {
+        errorMessage = 'Please check your email and click the confirmation link before signing in.';
+      }
       toast({
         title: 'Sign In Failed',
-        description: error.message,
+        description: errorMessage,
         variant: 'destructive',
       });
     } else {
@@ -65,7 +71,8 @@ const AuthPage = () => {
     } else {
       toast({
         title: 'Account Created!',
-        description: 'Your account has been created successfully. You can now sign in.',
+        description: 'Please check your email and click the confirmation link before signing in.',
+        variant: 'default',
       });
     }
 
@@ -126,13 +133,12 @@ const AuthPage = () => {
               </form>
 
               <div className="mt-4 p-3 bg-muted rounded-lg">
-                <p className="text-sm font-medium mb-2">Demo Accounts:</p>
+                <p className="text-sm font-medium mb-2">Quick Start:</p>
                 <div className="text-xs space-y-1">
-                  <p>Judge: judge@example.com</p>
-                  <p>Attorney: attorney@example.com</p>
-                  <p>Clerk: clerk@example.com</p>
-                  <p>Public: public@example.com</p>
-                  <p className="text-muted-foreground">Password: password</p>
+                  <p>1. Create account with Sign Up tab</p>
+                  <p>2. Check email and click confirmation link</p>
+                  <p>3. Return here and sign in</p>
+                  <p className="text-amber-600 mt-2">⚠️ Email confirmation required for new accounts</p>
                 </div>
               </div>
             </TabsContent>

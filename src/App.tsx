@@ -12,6 +12,9 @@ import HomePage from "./pages/HomePage";
 import AuthPage from "./pages/AuthPage"; 
 import Dashboard from "./pages/Dashboard";
 import CasesPage from "./pages/cases/CasesPage";
+import HearingsPage from "./pages/HearingsPage";
+import DocumentsPage from "./pages/DocumentsPage";
+import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +44,30 @@ const App = () => (
               <ProtectedRoute>
                 <AppLayout>
                   <CasesPage />
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/hearings" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <HearingsPage />
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/documents" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <DocumentsPage />
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <ProfilePage />
                 </AppLayout>
               </ProtectedRoute>
             } />

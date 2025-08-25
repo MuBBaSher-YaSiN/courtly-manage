@@ -10,7 +10,8 @@ import {
   Home,
   UserCheck,
   Gavel,
-  Upload
+  Upload,
+  User
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -42,6 +43,7 @@ export function AppSidebar() {
       { title: "Cases", url: "/cases", icon: Scale },
       { title: "Hearings", url: "/hearings", icon: Calendar },
       { title: "Documents", url: "/documents", icon: FileText },
+      { title: "Profile", url: "/profile", icon: User },
       { title: "Notifications", url: "/notifications", icon: Bell },
       { title: "Search", url: "/search", icon: Search },
     ];
