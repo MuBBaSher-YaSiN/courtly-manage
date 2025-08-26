@@ -449,7 +449,18 @@ export type Database = {
         | "ATTORNEY"
         | "WITNESS"
         | "EXPERT"
-      user_role: "ADMIN" | "JUDGE" | "ATTORNEY" | "CLERK" | "PUBLIC"
+      user_role: "public" | "judge" | "attorney" | "clerk" | "admin"
+      user_role_old:
+        | "ADMIN"
+        | "JUDGE"
+        | "ATTORNEY"
+        | "CLERK"
+        | "PUBLIC"
+        | "admin"
+        | "public"
+        | "judge"
+        | "attorney"
+        | "clerk"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -605,7 +616,19 @@ export const Constants = {
         "WITNESS",
         "EXPERT",
       ],
-      user_role: ["ADMIN", "JUDGE", "ATTORNEY", "CLERK", "PUBLIC"],
+      user_role: ["public", "judge", "attorney", "clerk", "admin"],
+      user_role_old: [
+        "ADMIN",
+        "JUDGE",
+        "ATTORNEY",
+        "CLERK",
+        "PUBLIC",
+        "admin",
+        "public",
+        "judge",
+        "attorney",
+        "clerk",
+      ],
     },
   },
 } as const
