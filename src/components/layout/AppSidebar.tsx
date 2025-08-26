@@ -1,17 +1,7 @@
-import { useState } from "react";
+// src/components/layout/AppSidebar.tsx
 import { 
-  Scale, 
-  Users, 
-  FileText, 
-  Calendar, 
-  Settings, 
-  Bell,
-  Search,
-  Home,
-  UserCheck,
-  Gavel,
-  Upload,
-  User
+  Scale, Users, FileText, Calendar, Settings, Bell,
+  Search, Home, UserCheck, Gavel, User
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,62 +16,58 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
-  useSidebar,
 } from "@/components/ui/sidebar";
 
 export function AppSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
-  const { session } = useAuth();
 
-  const userRole = session?.user?.app_metadata?.role || 'PUBLIC';
-
-  // Menu items based on role
-  const getMenuItems = () => {
-    const baseItems = [
-      { title: "Dashboard", url: "/dashboard", icon: Home },
-      { title: "Cases", url: "/cases", icon: Scale },
-      { title: "Hearings", url: "/hearings", icon: Calendar },
-      { title: "Documents", url: "/documents", icon: FileText },
-      { title: "Profile", url: "/profile", icon: User },
-      { title: "Notifications", url: "/notifications", icon: Bell },
-      { title: "Search", url: "/search", icon: Search },
-    ];
-
-    const adminItems = [
-      { title: "User Management", url: "/admin/users", icon: Users },
-      { title: "System Settings", url: "/admin/settings", icon: Settings },
-      { title: "Audit Logs", url: "/admin/audit", icon: UserCheck },
-    ];
-
-    const judgeClerkItems = [
-      { title: "Filings Review", url: "/filings", icon: Gavel },
-    ];
-
-    if (userRole === 'ADMIN') {
-      return [...baseItems, ...judgeClerkItems, ...adminItems];
-    } else if (userRole === 'JUDGE' || userRole === 'CLERK') {
-      return [...baseItems, ...judgeClerkItems];
-    } else {
-      return baseItems;
-    }
+  // Pull role from your auth context if available; otherwise from app_metadata; default to 'public'
+  const { session, role: ctxRole, loading } = useAuth() as {
+    session?: any; role?: string; loading?: boolean;
   };
+  const resolvedRole = (
+    ctxRole ??
+    session?.user?.app_metadata?.role ??
+    "public"
+  ).toString().toLowerCase();
 
-  const items = getMenuItems();
+  const baseItems = [
+    { title: "Dashboard", url: "/dashboard", icon: Home },
+    { title: "Cases", url: "/cases", icon: Scale },
+    { title: "Hearings", url: "/hearings", icon: Calendar },
+    { title: "Documents", url: "/documents", icon: FileText },
+    { title: "Profile", url: "/profile", icon: User },
+    { title: "Notifications", url: "/notifications", icon: Bell },
+    { title: "Search", url: "/search", icon: Search },
+  ];
 
-  const isActive = (path: string) => currentPath === path;
-  const isExpanded = items.some((i) => isActive(i.url));
+  const judgeClerkItems = [{ title: "Filings Review", url: "/filings", icon: Gavel }];
+
+  const adminItems = [
+    { title: "User Management", url: "/admin/users", icon: Users },
+    { title: "System Settings", url: "/admin/settings", icon: Settings },
+    { title: "Audit Logs", url: "/admin/audit", icon: UserCheck },
+  ];
+
+  const items =
+    resolvedRole === "admin"
+      ? [...baseItems, ...judgeClerkItems, ...adminItems]
+      : (resolvedRole === "judge" || resolvedRole === "clerk")
+      ? [...baseItems, ...judgeClerkItems]
+      : baseItems;
+
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "hover:bg-sidebar-accent/50";
+    isActive
+      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+      : "hover:bg-sidebar-accent/50";
 
   return (
     <Sidebar collapsible="icon">
       <SidebarTrigger className="m-2 self-end" />
-
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Court Management</SidebarGroupLabel>
-
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
