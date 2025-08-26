@@ -20,12 +20,11 @@ import {
 
 export function AppSidebar() {
   const location = useLocation();
-  const currentPath = location.pathname;
-
-  // Pull role from your auth context if available; otherwise from app_metadata; default to 'public'
   const { session, role: ctxRole, loading } = useAuth() as {
     session?: any; role?: string; loading?: boolean;
   };
+
+  // Resolve role: prefer context role (from public.users), fall back to app_metadata, default 'public'
   const resolvedRole = (
     ctxRole ??
     session?.user?.app_metadata?.role ??
