@@ -1,3 +1,4 @@
+// components/ProtectedRoute.tsx
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 
@@ -7,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children, requiredRoles }: ProtectedRouteProps) => {
-  const { user, loading, session } = useAuth();
+  const { user, loading, session, role } = useAuth();
 
   if (loading) {
     return (
@@ -21,12 +22,9 @@ export const ProtectedRoute = ({ children, requiredRoles }: ProtectedRouteProps)
     return <Navigate to="/auth" replace />;
   }
 
-  // Check role-based access if requiredRoles is specified
-  if (requiredRoles && requiredRoles.length > 0) {
-    const userRole = session.user?.app_metadata?.role?.toLowerCase();
-    if (!userRole || !requiredRoles.map(r => r.toLowerCase()).includes(userRole)) {
-      return <Navigate to="/dashboard" replace />;
-    }
+  if (requiredRoles?.length) {
+    const allow = requiredRoles.map(r => r.toLowerCase()).includes((role ?? 'public').toLowerCase());
+    if (!allow) return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
