@@ -46,6 +46,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } catch (error) {
         console.error('Error fetching user role:', error);
       }
+      
+      // Always set session and user, even if role fetch fails
+      setSession(session);
+      setUser(session.user);
       return session;
     };
 
