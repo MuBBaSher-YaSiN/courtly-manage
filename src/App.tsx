@@ -19,6 +19,16 @@ import NotFound from "./pages/NotFound";
 
 import AboutPage from "./pages/AboutPage";
 
+// Admin Pages
+import UserManagement from "./pages/admin/UserManagement";
+import SystemSettings from "./pages/admin/SystemSettings";
+import AuditLogs from "./pages/admin/AuditLogs";
+
+// Other Pages
+import NotificationsPage from "./pages/NotificationsPage";
+import SearchPage from "./pages/SearchPage";
+import FilingsPage from "./pages/FilingsPage";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -75,6 +85,54 @@ const App = () => (
             } />
             
             <Route path="/about" element={<AboutPage />} />
+            
+            <Route path="/notifications" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <NotificationsPage />
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/search" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <SearchPage />
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/filings" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <FilingsPage />
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/admin/users" element={
+              <ProtectedRoute requiredRoles={['admin']}>
+                <AppLayout>
+                  <UserManagement />
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/admin/settings" element={
+              <ProtectedRoute requiredRoles={['admin']}>
+                <AppLayout>
+                  <SystemSettings />
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/admin/audit" element={
+              <ProtectedRoute requiredRoles={['admin']}>
+                <AppLayout>
+                  <AuditLogs />
+                </AppLayout>
+              </ProtectedRoute>
+            } />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
