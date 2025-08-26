@@ -136,8 +136,8 @@ const AuthPage = () => {
                 <p className="text-sm font-medium mb-2">Quick Start:</p>
                 <div className="text-xs space-y-1">
                   <p>1. Create account with Sign Up tab</p>
-                  <p>2. Check email and click confirmation link</p>
-                  <p>3. Return here and sign in</p>
+{/*                   <p>2. Check email and click confirmation link</p> */}
+                  <p>2. Return here and sign in</p>
 {/*                   <p className="text-amber-600 mt-2">⚠️ Email confirmation required for new accounts</p> */}
                 </div>
               </div>
