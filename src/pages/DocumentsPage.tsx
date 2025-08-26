@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { FileText, Upload, Search, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import DocumentUpload from '@/components/DocumentUpload';
 
 interface Document {
   id: string;
