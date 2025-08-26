@@ -23,8 +23,8 @@ export const ProtectedRoute = ({ children, requiredRoles }: ProtectedRouteProps)
 
   // Check role-based access if requiredRoles is specified
   if (requiredRoles && requiredRoles.length > 0) {
-    const userRole = session.user?.app_metadata?.role;
-    if (!userRole || !requiredRoles.includes(userRole)) {
+    const userRole = session.user?.app_metadata?.role?.toLowerCase();
+    if (!userRole || !requiredRoles.map(r => r.toLowerCase()).includes(userRole)) {
       return <Navigate to="/dashboard" replace />;
     }
   }
