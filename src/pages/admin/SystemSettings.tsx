@@ -9,6 +9,8 @@ import { Separator } from '@/components/ui/separator';
 import { Settings, Save, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import DebugAuth from '@/components/DebugAuth';
+import ErrorPanel from '@/components/ErrorPanel';
 
 interface SystemSetting {
   key: string;
@@ -31,6 +33,7 @@ const SystemSettings = () => {
     backup_frequency_hours: 24
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
@@ -41,11 +44,18 @@ const SystemSettings = () => {
   const fetchSettings = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
       const { data, error } = await supabase
         .from('system_settings')
-        .select('*');
+        .select('key, value');
 
-      if (error) throw error;
+      console.log('ADMIN PAGE SETTINGS SELECT RESULT', { data, error });
+
+      if (error) {
+        console.error('ADMIN PAGE SETTINGS SELECT ERROR', error);
+        throw error;
+      }
 
       // Convert array of settings to object
       const settingsObj: Record<string, any> = {};
@@ -54,11 +64,12 @@ const SystemSettings = () => {
       });
       
       setSettings(prev => ({ ...prev, ...settingsObj }));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching settings:', error);
+      setError(error?.message || 'Failed to fetch settings');
       toast({
         title: 'Info',
-        description: 'Using default settings (no custom settings found)',
+        description: 'Using default settings. ' + (error?.message || 'No custom settings found'),
       });
     } finally {
       setLoading(false);
@@ -107,8 +118,18 @@ const SystemSettings = () => {
     }));
   };
 
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <DebugAuth />
+        <ErrorPanel message={error} onRetry={fetchSettings} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
+      <DebugAuth />
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">

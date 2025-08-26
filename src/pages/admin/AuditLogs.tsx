@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { FileText, Search, Download, Filter, UserCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import DebugAuth from '@/components/DebugAuth';
+import ErrorPanel from '@/components/ErrorPanel';
 
 interface AuditLog {
   id: string;
@@ -22,6 +24,7 @@ interface AuditLog {
 const AuditLogs = () => {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [actionFilter, setActionFilter] = useState('all');
   const [entityFilter, setEntityFilter] = useState('all');
@@ -33,19 +36,29 @@ const AuditLogs = () => {
 
   const fetchAuditLogs = async () => {
     try {
+      setLoading(true);
+      setError(null);
+      
       const { data, error } = await supabase
         .from('audit_log')
-        .select('*')
+        .select('id, actor_id, action, entity_type, entity_id, timestamp, meta')
         .order('timestamp', { ascending: false })
         .limit(100);
 
-      if (error) throw error;
+      console.log('ADMIN PAGE AUDIT SELECT RESULT', { data, error });
+
+      if (error) {
+        console.error('ADMIN PAGE AUDIT SELECT ERROR', error);
+        throw error;
+      }
+      
       setLogs(data || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching audit logs:', error);
+      setError(error?.message || 'Failed to fetch audit logs');
       toast({
         title: 'Error',
-        description: 'Failed to fetch audit logs',
+        description: error?.message || 'Failed to fetch audit logs',
         variant: 'destructive',
       });
     } finally {
@@ -122,14 +135,27 @@ const AuditLogs = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="space-y-4">
+        <DebugAuth />
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <DebugAuth />
+        <ErrorPanel message={error} onRetry={fetchAuditLogs} />
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
+      <DebugAuth />
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">

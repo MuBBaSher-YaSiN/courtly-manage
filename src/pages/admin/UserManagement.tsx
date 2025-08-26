@@ -11,6 +11,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Users, Plus, Edit, Trash2, Search, UserCheck, UserX } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import DebugAuth from '@/components/DebugAuth';
+import ErrorPanel from '@/components/ErrorPanel';
 
 interface User {
   id: string;
@@ -24,6 +26,7 @@ interface User {
 const UserManagement = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -35,18 +38,28 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
+      setLoading(true);
+      setError(null);
+      
       const { data, error } = await supabase
         .from('users')
-        .select('*')
+        .select('id, email, username, role, active, created_at')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('ADMIN PAGE USERS SELECT RESULT', { data, error });
+
+      if (error) {
+        console.error('ADMIN PAGE USERS SELECT ERROR', error);
+        throw error;
+      }
+      
       setUsers(data || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching users:', error);
+      setError(error?.message || 'Failed to fetch users');
       toast({
         title: 'Error',
-        description: 'Failed to fetch users',
+        description: error?.message || 'Failed to fetch users',
         variant: 'destructive',
       });
     } finally {
@@ -146,14 +159,27 @@ const UserManagement = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      <div className="space-y-4">
+        <DebugAuth />
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <DebugAuth />
+        <ErrorPanel message={error} onRetry={fetchUsers} />
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
+      <DebugAuth />
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">

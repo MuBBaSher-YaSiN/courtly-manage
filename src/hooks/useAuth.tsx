@@ -21,11 +21,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fetchUserRole = async (session: Session) => {
       try {
-        const { data: userData } = await supabase
+        const { data: userData, error } = await supabase
           .from('users')
           .select('role')
           .eq('auth_user_id', session.user.id)
           .single();
+        
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error fetching user role:', error);
+        }
         
         if (userData?.role) {
           // Update the session metadata with the role
@@ -53,28 +57,53 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return session;
     };
 
+    let initComplete = false;
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        try {
+          if (session?.user) {
+            await fetchUserRole(session);
+          } else {
+            setSession(session);
+            setUser(session?.user ?? null);
+          }
+        } catch (error) {
+          console.error('Auth state change error:', error);
+          setSession(session);
+          setUser(session?.user ?? null);
+        } finally {
+          setLoading(false);
+        }
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(async ({ data: { session }, error }) => {
+      if (error) {
+        console.error('Error getting session:', error);
+        setLoading(false);
+        return;
+      }
+
+      try {
         if (session?.user) {
           await fetchUserRole(session);
         } else {
           setSession(session);
           setUser(session?.user ?? null);
         }
-        setLoading(false);
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        await fetchUserRole(session);
-      } else {
+      } catch (error) {
+        console.error('Session initialization error:', error);
         setSession(session);
         setUser(session?.user ?? null);
+      } finally {
+        if (!initComplete) {
+          setLoading(false);
+          initComplete = true;
+        }
       }
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
