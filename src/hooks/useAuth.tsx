@@ -21,9 +21,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        
+        // Update user role in session metadata when signing in
+        if (event === 'SIGNED_IN' && session?.user) {
+          // Fetch user role from database
+          setTimeout(async () => {
+            try {
+              const { data: userData } = await supabase
+                .from('users')
+                .select('role')
+                .eq('auth_user_id', session.user.id)
+                .single();
+              
+              if (userData?.role) {
+                // Update the session metadata with the role
+                const updatedSession = {
+                  ...session,
+                  user: {
+                    ...session.user,
+                    app_metadata: {
+                      ...session.user.app_metadata,
+                      role: userData.role
+                    }
+                  }
+                };
+                setSession(updatedSession);
+              }
+            } catch (error) {
+              console.error('Error fetching user role:', error);
+            }
+          }, 0);
+        }
+        
         setLoading(false);
       }
     );

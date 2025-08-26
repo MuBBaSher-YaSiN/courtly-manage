@@ -96,10 +96,7 @@ const HearingsPage = () => {
             Manage court hearings and schedules
           </p>
         </div>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
-          Schedule Hearing
-        </Button>
+        <HearingScheduler onScheduleComplete={fetchHearings} />
       </div>
 
       <div className="space-y-4">

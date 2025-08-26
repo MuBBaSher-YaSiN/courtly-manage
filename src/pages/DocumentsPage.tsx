@@ -106,10 +106,7 @@ const DocumentsPage = () => {
             Manage case documents and files
           </p>
         </div>
-        <Button>
-          <Upload className="w-4 h-4 mr-2" />
-          Upload Document
-        </Button>
+        <DocumentUpload onUploadComplete={fetchDocuments} />
       </div>
 
       <div className="mb-6">
