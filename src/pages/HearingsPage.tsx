@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar, Clock, MapPin, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
+import HearingScheduler from '@/components/HearingScheduler';
 interface Hearing {
   id: string;
   case_id: string;
