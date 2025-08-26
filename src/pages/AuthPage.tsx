@@ -138,7 +138,7 @@ const AuthPage = () => {
                   <p>1. Create account with Sign Up tab</p>
                   <p>2. Check email and click confirmation link</p>
                   <p>3. Return here and sign in</p>
-                  <p className="text-amber-600 mt-2">⚠️ Email confirmation required for new accounts</p>
+{/*                   <p className="text-amber-600 mt-2">⚠️ Email confirmation required for new accounts</p> */}
                 </div>
               </div>
             </TabsContent>
